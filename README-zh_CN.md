@@ -8,6 +8,7 @@
 
 -  [English](README.md)
 -  [中文](README-zh_CN.md)
+-  [日本語](README-ja_JP.md)
 
 
 **GPT Researcher 是一个智能体代理，专为各种任务的综合在线研究而设计。**
@@ -25,7 +26,7 @@
 
 ## 架构
 主要思想是运行“**计划者**”和“**执行**”代理，而**计划者**生成问题进行研究，“**执行**”代理根据每个生成的研究问题寻找最相关的信息。最后，“**计划者**”过滤和聚合所有相关信息并创建研究报告。<br /> <br /> 
-代理同时利用 gpt3.5-turbo 和 gpt-4o（128K 上下文）来完成一项研究任务。我们仅在必要时使用这两种方法对成本进行优化。**研究任务平均耗时约 3 分钟，成本约为 ~0.1 美元**。
+代理同时利用 gpt-40-mini 和 gpt-4o（128K 上下文）来完成一项研究任务。我们仅在必要时使用这两种方法对成本进行优化。**研究任务平均耗时约 3 分钟，成本约为 ~0.1 美元**。
 
 <div align="center">
 <img align="center" height="500" src="https://cowriter-images.s3.amazonaws.com/architecture.png">
@@ -112,7 +113,7 @@ $ uvicorn main:app --reload
 ## 🚀 贡献
 我们非常欢迎您的贡献！如果您感兴趣，请查看 [contributing](CONTRIBUTING.md)。
 
-如果您有兴趣加入我们的任务，请查看我们的 [路线图](https://trello.com/b/3O7KBePw/gpt-researcher-roadmap) 页面，并通过我们的 [Discord 社区](https://discord.gg/2pFkc83fRq) 联系我们。
+如果您有兴趣加入我们的任务，请查看我们的 [路线图](https://trello.com/b/3O7KBePw/gpt-researcher-roadmap) 页面，并通过我们的 [Discord 社区](https://discord.gg/QgZXvJAccX) 联系我们。
 
 ## ✉️ 支持 / 联系我们
 - [社区讨论区](https://discord.gg/spBgZmm3Xe)

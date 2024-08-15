@@ -3,53 +3,20 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import Optional
+from typing import Optional, Any, Dict
 
 from colorama import Fore, Style
-from fastapi import WebSocket
 from langchain.output_parsers import PydanticOutputParser
 from langchain.prompts import PromptTemplate
 
-from gpt_researcher.master.prompts import auto_agent_instructions, generate_subtopics_prompt
+from gpt_researcher.master.prompts import generate_subtopics_prompt
 from .costs import estimate_llm_cost
 from .validators import Subtopics
 
 
-def get_provider(llm_provider):
-    match llm_provider:
-        case "openai":
-            from ..llm_provider import OpenAIProvider
-            llm_provider = OpenAIProvider
-        case "azureopenai":
-            from ..llm_provider import AzureOpenAIProvider
-            llm_provider = AzureOpenAIProvider
-        case "google":
-            from ..llm_provider import GoogleProvider
-            llm_provider = GoogleProvider
-        case "ollama":
-            from ..llm_provider import OllamaProvider
-            llm_provider = OllamaProvider
-        case "groq":
-            from ..llm_provider import GroqProvider
-            llm_provider = GroqProvider
-        case "together":
-            from ..llm_provider import TogetherProvider
-            llm_provider = TogetherProvider
-        case "huggingface":
-            from ..llm_provider import HugginFaceProvider
-            llm_provider = HugginFaceProvider
-        case "mistral":
-            from ..llm_provider import MistralProvider
-            llm_provider = MistralProvider
-        case "anthropic":
-            from ..llm_provider import AnthropicProvider
-            llm_provider = AnthropicProvider
-        case _:
-            raise Exception("LLM provider not found. "
-                            "Check here to learn more about support LLMs: "
-                            "https://docs.gptr.dev/docs/gpt-researcher/llms")
-
-    return llm_provider
+def get_llm(llm_provider, **kwargs):
+    from gpt_researcher.llm_provider import GenericLLMProvider
+    return GenericLLMProvider.from_provider(llm_provider, **kwargs)
 
 
 async def create_chat_completion(
@@ -58,8 +25,10 @@ async def create_chat_completion(
         temperature: float = 1.0,
         max_tokens: Optional[int] = 2000,
         llm_provider: Optional[str] = None,
+        openai_api_key=None,
         stream: Optional[bool] = False,
-        websocket: WebSocket | None = None,
+        websocket: Any | None = None,
+        llm_kwargs: Dict[str, Any] | None = None,
         cost_callback: callable = None
 ) -> str:
     """Create a chat completion using the OpenAI API
@@ -84,12 +53,7 @@ async def create_chat_completion(
             f"Max tokens cannot be more than 8001, but got {max_tokens}")
 
     # Get the provider from supported providers
-    ProviderClass = get_provider(llm_provider)
-    provider = ProviderClass(
-        model,
-        temperature,
-        max_tokens
-    )
+    provider = get_llm(llm_provider, model=model, temperature=temperature, max_tokens=max_tokens, **(llm_kwargs or {}))
 
     response = ""
     # create response
@@ -123,10 +87,7 @@ async def construct_subtopics(task: str, data: str, config, subtopics: list = []
 
         temperature = config.temperature
         # temperature = 0 # Note: temperature throughout the code base is currently set to Zero
-        ProviderClass = get_provider(config.llm_provider)
-        provider = ProviderClass(model=config.smart_llm_model,
-                                 temperature=temperature,
-                                 max_tokens=config.smart_token_limit)
+        provider = get_llm(config.llm_provider, model=config.smart_llm_model, temperature=temperature, max_tokens=config.smart_token_limit, **config.llm_kwargs)
         model = provider.llm
 
 
