@@ -31,6 +31,8 @@ lxml-html-clean = "*"
 websockets = "*"
 unstructured = "*"
 json-repair = "*"
+json5 = "*"
+langgraph = "*"
 
 [dev-packages]
 
