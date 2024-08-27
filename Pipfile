@@ -18,7 +18,7 @@ langchain = "<0.3,>=0.2"
 langchain-community = "<0.3,>=0.2"
 langchain-openai = "<0.2,>=0.1"
 tiktoken = "*"
-gpt-researcher = "*"
+gpt-researcher = "0.8.7"
 arxiv = "*"
 pymupdf = "*"
 requests = "*"
@@ -35,6 +35,7 @@ json5 = "*"
 langgraph = "*"
 
 [dev-packages]
+ipykernel = "*"
 
 [requires]
 python_version = "3.11"

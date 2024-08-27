@@ -9,7 +9,7 @@ class Config:
     def __init__(self, config_file: str = None):
         """Initialize the config class."""
         self.config_file = os.path.expanduser(config_file) if config_file else os.getenv('CONFIG_FILE')
-        self.retrievers = self.parse_retrievers(os.getenv('RETRIEVER', "tavily"))
+        self.retrievers: list[str] = self.parse_retrievers(os.getenv('RETRIEVER', "tavily"))
         self.embedding_provider = os.getenv('EMBEDDING_PROVIDER', 'openai')
         self.similarity_threshold = int(os.getenv('SIMILARITY_THRESHOLD', 0.38))
         self.llm_provider = os.getenv('LLM_PROVIDER', "openai")
@@ -44,7 +44,7 @@ class Config:
         if self.doc_path:
             self.validate_doc_path()
 
-    def parse_retrievers(self, retriever_str: str):
+    def parse_retrievers(self, retriever_str: str) -> list[str]:
         """Parse the retriever string into a list of retrievers and validate them."""
         VALID_RETRIEVERS = [
             "arxiv", "bing", "custom", "duckduckgo", "exa", "google", "searx",
