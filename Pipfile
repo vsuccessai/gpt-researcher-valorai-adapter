@@ -33,6 +33,7 @@ unstructured = "*"
 json-repair = "*"
 json5 = "*"
 langgraph = "*"
+langchain-anthropic = "*"
 
 [dev-packages]
 ipykernel = "*"
