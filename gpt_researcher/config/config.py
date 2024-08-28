@@ -36,6 +36,7 @@ class Config:
         self.report_source = os.getenv("REPORT_SOURCE", None)
         self.doc_path = os.getenv("DOC_PATH", "")
         self.llm_kwargs = {} 
+        #print(self.__dict__)
 
         self.load_config_file()
         if not hasattr(self, "llm_kwargs"):

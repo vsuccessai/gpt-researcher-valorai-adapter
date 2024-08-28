@@ -6,6 +6,7 @@ class ExtConfig(Config):
     def __init__(self, config_file: str = None, **kwargs):
         super().__init__(config_file)
         self.add_custom_config(kwargs) #update the config with custom config
+        #print("Extended config", self.__dict__)
         
     def add_custom_config(self, custom_config: dict) -> None: 
         """Update the config with custom config."""	

@@ -90,8 +90,7 @@ class ExtendGPTResearcher(GPTResearcher):
         self.parent_query = parent_query
 
         # Stores all the user provided subtopics
-        self.subtopics = subtopics
-        print(self.cfg.__dict__)
+        self.subtopics = subtopics        
 
 # async def main():
 #     query = "What is the capital of France?"

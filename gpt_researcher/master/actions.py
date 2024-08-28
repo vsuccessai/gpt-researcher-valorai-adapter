@@ -78,7 +78,7 @@ def get_retriever(retriever):
     return retriever
 
 
-def get_retrievers(headers, cfg) -> list[str]:
+def get_retrievers(headers, cfg):
     """
     Determine which retriever(s) to use based on headers, config, or default.
 
@@ -110,8 +110,7 @@ def get_retrievers(headers, cfg) -> list[str]:
     return [get_retriever(r) or get_default_retriever() for r in retrievers]
 
 
-def get_default_retriever():
-    """Default retriever to use if no other retriever is specified."""
+def get_default_retriever(retriever):
     from gpt_researcher.retrievers import TavilySearch
 
     return TavilySearch

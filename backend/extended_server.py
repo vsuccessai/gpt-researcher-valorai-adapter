@@ -82,12 +82,13 @@ async def websocket_endpoint(websocket: WebSocket):
                 # headers = json_data.get("headers", {})    
                 # report_source = json_data.get("report_source")
                 # retrievers = json_data.get("retrievers")
-                print(json_data)
+                #print(json_data)
                 #Run the agent
                 if task and report_type:
                     report = await manager.start_streaming(
                        websocket=websocket, **json_data
-                    )         
+                    )
+                    await websocket.send_json({"type": "path", "report": report}) #finish the websocket connection         
                 else:
                     print("Error: not enough parameters provided.")
     except WebSocketDisconnect:
