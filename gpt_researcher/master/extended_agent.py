@@ -21,14 +21,13 @@ class ExtendGPTResearcher(GPTResearcher):
 
     def __init__(
         self,
-        query: str,
-        cfg: ExtConfig,
+        query: str, 
         report_type: str = ReportType.ResearchReport.value,
         report_source=ReportSource.Web.value,
         tone: Tone = Tone.Objective,
         source_urls=None,
         documents=None,
-        #config_path=None,
+        config_path=None,
         websocket=None,
         agent=None,
         role=None,
@@ -38,6 +37,7 @@ class ExtendGPTResearcher(GPTResearcher):
         verbose: bool = True,
         context=[],
         headers: dict = None,  # Add headers parameter 
+        **kwargs # Additional parameters for the ExtConfig class
     ):
         """
         Initialize the GPT Researcher class.
@@ -63,8 +63,7 @@ class ExtendGPTResearcher(GPTResearcher):
             self.report_type
         )  # this validates the report type
         self.research_costs: float = 0.0
-        #self.cfg = Config(config_path)
-        self.cfg = cfg # for dynamic config (extended config)
+        self.cfg = ExtConfig(config_file=config_path, **kwargs)        
         self.report_source: str = self.cfg.report_source or report_source
         self.retrievers = get_retrievers(self.headers, self.cfg)
         self.context = context
@@ -92,6 +91,7 @@ class ExtendGPTResearcher(GPTResearcher):
 
         # Stores all the user provided subtopics
         self.subtopics = subtopics
+        print(self.cfg.__dict__)
 
 # async def main():
 #     query = "What is the capital of France?"
