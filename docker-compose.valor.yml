@@ -1,0 +1,14 @@
+version: '3'
+services:
+  gpt-researcher:
+    image: gptresearcher/gpt-researcher
+    build:
+      context: ./
+      dockerfile: Dockerfile.valor
+    environment: 
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      TAVILY_API_KEY: ${TAVILY_API_KEY}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+    restart: always
+    ports:
+      - 8010:8000
