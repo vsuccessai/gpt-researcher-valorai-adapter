@@ -1,7 +1,8 @@
 version: '3'
 services:
   gpt-researcher:
-    image: gptresearcher/gpt-researcher
+    container_name: vv-gpt-researcher
+    #image: gptresearcher/gpt-researcher
     build:
       context: ./
       dockerfile: Dockerfile.valor
@@ -11,4 +12,4 @@ services:
       LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
     restart: always
     ports:
-      - 8010:8000
+      - 80:8000
