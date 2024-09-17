@@ -1,8 +1,8 @@
 import asyncio
 import json
+import logging
 import re
 from typing import Dict, List
-
 import json_repair
 import markdown
 
@@ -10,7 +10,9 @@ from gpt_researcher.master.prompts import *
 from gpt_researcher.scraper.scraper import Scraper
 from gpt_researcher.utils.enum import Tone
 from gpt_researcher.utils.llm import *
+from gpt_researcher.utils.logger import get_formatted_logger
 
+logger = get_formatted_logger()
 
 def get_retriever(retriever):
     """
@@ -35,7 +37,7 @@ def get_retriever(retriever):
             from gpt_researcher.retrievers import SerpApiSearch
 
             retriever = SerpApiSearch
-        case "googleSerp":
+        case "serper":
             from gpt_researcher.retrievers import SerperSearch
 
             retriever = SerperSearch
@@ -142,11 +144,10 @@ async def choose_agent(
                 {"role": "system", "content": f"{auto_agent_instructions()}"},
                 {"role": "user", "content": f"task: {query}"},
             ],
-            temperature=0,
+            temperature=0.15,
             llm_provider=cfg.llm_provider,
             llm_kwargs=cfg.llm_kwargs,
             cost_callback=cost_callback,
-            openai_api_key=headers.get("openai_api_key"),
         )
 
         agent_dict = json.loads(response)
@@ -194,7 +195,6 @@ async def get_sub_queries(
     parent_query: str,
     report_type: str,
     cost_callback: callable = None,
-    openai_api_key=None,
 ):
     """
     Gets the sub queries
@@ -225,11 +225,10 @@ async def get_sub_queries(
                 ),
             },
         ],
-        temperature=0,
+        temperature=0.1,
         llm_provider=cfg.llm_provider,
         llm_kwargs=cfg.llm_kwargs,
         cost_callback=cost_callback,
-        openai_api_key=openai_api_key,
     )
 
     sub_queries = json_repair.loads(response)
@@ -252,7 +251,7 @@ def scrape_urls(urls, cfg=None):
     user_agent = (
         cfg.user_agent
         if cfg
-        else "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0"
+        else "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
     )
     try:
         content = Scraper(urls, user_agent, cfg.scraper).run()
@@ -261,65 +260,29 @@ def scrape_urls(urls, cfg=None):
     return content
 
 
-# Deprecated: Instead of summaries using ContextualRetriever embedding.
-# This exists in case we decide to modify in the future
-async def summarize(
-    query,
-    content,
-    agent_role_prompt,
-    cfg,
-    websocket=None,
-    cost_callback: callable = None,
+async def write_conclusion(
+    report, agent_role_prompt, cfg, cost_callback: callable = None
 ):
-    """
-    Asynchronously summarizes a list of URLs.
-
-    Args:
-        query (str): The search query.
-        content (list): List of dictionaries with 'url' and 'raw_content'.
-        agent_role_prompt (str): The role prompt for the agent.
-        cfg (object): Configuration object.
-
-    Returns:
-        list: A list of dictionaries with 'url' and 'summary'.
-    """
-
-    # Function to handle each summarization task for a chunk
-    async def handle_task(url, chunk):
-        summary = await summarize_url(
-            query, chunk, agent_role_prompt, cfg, cost_callback
+    conclusion_prompt = generate_report_conclusion(report_content=report)
+    conclusion = ""
+    try:
+        conclusion = await create_chat_completion(
+            model=cfg.fast_llm_model,
+            messages=[
+                {"role": "system", "content": f"{agent_role_prompt}"},
+                {
+                    "role": "user",
+                    "content": f"{conclusion_prompt}",
+                },
+            ],
+            temperature=0.35,
+            llm_provider=cfg.llm_provider,
+            llm_kwargs=cfg.llm_kwargs,
+            cost_callback=cost_callback,
         )
-        if summary:
-            await stream_output(
-                "logs", "url_summary_coming_up", f"🌐 Summarizing url: {url}", websocket
-            )
-            await stream_output("logs", "url_summary", f"📃 {summary}", websocket)
-        return url, summary
-
-    # Function to split raw content into chunks of 10,000 words
-    def chunk_content(raw_content, chunk_size=10000):
-        words = raw_content.split()
-        for i in range(0, len(words), chunk_size):
-            yield " ".join(words[i : i + chunk_size])
-
-    # Process each item one by one, but process chunks in parallel
-    concatenated_summaries = []
-    for item in content:
-        url = item["url"]
-        raw_content = item["raw_content"]
-
-        # Create tasks for all chunks of the current URL
-        chunk_tasks = [handle_task(url, chunk) for chunk in chunk_content(raw_content)]
-
-        # Run chunk tasks concurrently
-        chunk_summaries = await asyncio.gather(*chunk_tasks)
-
-        # Aggregate and concatenate summaries for the current URL
-        summaries = [summary for _, summary in chunk_summaries if summary]
-        concatenated_summary = " ".join(summaries)
-        concatenated_summaries.append({"url": url, "summary": concatenated_summary})
-
-    return concatenated_summaries
+    except Exception as e:
+        print(f"{Fore.RED}Error in generating report conclusion: {e}{Style.RESET_ALL}")
+    return conclusion
 
 
 async def summarize_url(
@@ -349,7 +312,7 @@ async def summarize_url(
                     "content": f"{generate_summary_prompt(query, raw_data)}",
                 },
             ],
-            temperature=0,
+            temperature=0.35,
             llm_provider=cfg.llm_provider,
             llm_kwargs=cfg.llm_kwargs,
             cost_callback=cost_callback,
@@ -378,7 +341,7 @@ async def generate_draft_section_titles(
                 {"role": "system", "content": f"{agent_role_prompt}"},
                 {"role": "user", "content": content},
             ],
-            temperature=0,
+            temperature=0.15,
             llm_provider=cfg.llm_provider,
             llm_kwargs=cfg.llm_kwargs,
             cost_callback=cost_callback,
@@ -436,14 +399,13 @@ async def generate_report(
                 {"role": "system", "content": f"{agent_role_prompt}"},
                 {"role": "user", "content": content},
             ],
-            temperature=0,
+            temperature=0.35,
             llm_provider=cfg.llm_provider,
             stream=True,
             websocket=websocket,
             max_tokens=cfg.smart_token_limit,
             llm_kwargs=cfg.llm_kwargs,
             cost_callback=cost_callback,
-            openai_api_key=headers.get("openai_api_key"),
         )
     except Exception as e:
         print(f"{Fore.RED}Error in generate_report: {e}{Style.RESET_ALL}")
@@ -452,7 +414,7 @@ async def generate_report(
 
 
 async def stream_output(
-    type, content, output, websocket=None, logging=True, metadata=None
+    type, content, output, websocket=None, output_log=True, metadata=None
 ):
     """
     Streams output to the websocket
@@ -464,12 +426,12 @@ async def stream_output(
     Returns:
         None
     """
-    if not websocket or logging:
+    if not websocket or output_log:
         try:
-            print(output)
+            logger.info(output)
         except UnicodeEncodeError:
             # Option 1: Replace problematic characters with a placeholder
-            print(output.encode('cp1252', errors='replace').decode('cp1252'))
+            logger.error(output.encode('cp1252', errors='replace').decode('cp1252'))
 
     if websocket:
         await websocket.send_json(
@@ -490,7 +452,7 @@ async def get_report_introduction(
                     "content": generate_report_introduction(query, context),
                 },
             ],
-            temperature=0,
+            temperature=0.25,
             llm_provider=config.llm_provider,
             stream=True,
             websocket=websocket,
@@ -604,7 +566,7 @@ def table_of_contents(markdown_text: str):
         return markdown_text  # Return original markdown text if an exception occurs
 
 
-def add_source_urls(report_markdown: str, visited_urls: set):
+def add_references(report_markdown: str, visited_urls: set):
     """
     This function takes a Markdown report and a set of visited URLs as input parameters.
 

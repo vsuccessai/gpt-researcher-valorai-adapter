@@ -29,7 +29,8 @@ def generate_search_queries_prompt(
         task = question
 
     return (
-        f'Write {max_iterations} google search queries to search online that form an objective opinion from the following task: "{task}"'
+        f'Write {max_iterations} google search queries to search online that form an objective opinion from the following task: "{task}"\n'
+        f"Assume the current date is {datetime.now(timezone.utc).strftime('%B %d, %Y')} if required.\n"
         f'You must respond with a list of strings in the following format: ["query 1", "query 2", "query 3"].\n'
         f"The response should contain ONLY the list."
     )
@@ -70,13 +71,14 @@ Information: "{context}"
 ---
 Using the above information, answer the following query or task: "{question}" in a detailed report --
 The report should focus on the answer to the query, should be well structured, informative, 
-in-depth, and comprehensive, with facts and numbers if available and a minimum of {total_words} words.
+in-depth, and comprehensive, with facts and numbers if available and a total of up to {total_words} words.
 You should strive to write the report as long as you can using all relevant and necessary information provided.
 
 Please follow all of the following guidelines in your report:
 - You MUST determine your own concrete and valid opinion based on the given information. Do NOT defer to general and meaningless conclusions.
 - You MUST write the report with markdown syntax and {report_format} format.
-- Use an unbiased and journalistic tone.
+- You MUST prioritize the relevance, reliability, and significance of the sources you use. Choose trusted sources over less reliable ones.
+- You must also prioritize new articles over older articles if the source can be trusted.
 - Use in-text citation references in {report_format} format and make it with markdown hyperlink placed at the end of the sentence or paragraph that references them like this: ([in-text citation](url)).
 - Don't forget to add a reference list at the end of the report in {report_format} format and full url links without hyperlinks.
 - {reference_prompt}
@@ -126,13 +128,13 @@ def generate_resource_report_prompt(
 
 
 def generate_custom_report_prompt(
-    query_prompt, context, report_source: str, report_format="apa", total_words=1000
+    query_prompt, context, report_source: str, report_format="apa", tone=None, total_words=1000
 ):
     return f'"{context}"\n\n{query_prompt}'
 
 
 def generate_outline_report_prompt(
-    question, context, report_source: str, report_format="apa", total_words=1000
+    question, context, report_source: str, report_format="apa",tone=None,  total_words=1000
 ):
     """Generates the outline report prompt for the given question and research summary.
     Args: question (str): The question to generate the outline report prompt for
@@ -344,6 +346,26 @@ Using the above latest information, Prepare a detailed report introduction on th
 - You must include hyperlinks with markdown syntax ([url website](url)) related to the sentences wherever necessary.
 Assume that the current date is {datetime.now(timezone.utc).strftime('%B %d, %Y')} if required.
 """
+
+def generate_report_conclusion(report_content: str) -> str:
+    prompt = f"""
+    Based on the following research report, please write a concise conclusion that summarizes the main findings and their implications:
+
+    {report_content}
+
+    Your conclusion should:
+    1. Recap the main points of the research
+    2. Highlight the most important findings
+    3. Discuss any implications or next steps
+    4. Be approximately 2-3 paragraphs long
+    
+    If there is no "## Conclusion" section title written at the end of the report, please add it to the top of your conclusion. 
+    You must include hyperlinks with markdown syntax ([url website](url)) related to the sentences wherever necessary.
+    
+    Write the conclusion:
+    """
+
+    return prompt
 
 
 report_type_mapping = {
