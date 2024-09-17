@@ -1,4 +1,4 @@
-FROM python:3.11.4-slim-bullseye as install-browser
+FROM python:3.11.4-slim-bullseye AS install-browser
 
 RUN apt-get update \
     && apt-get satisfy -y \
@@ -18,7 +18,7 @@ RUN apt-get update \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-FROM install-browser as gpt-researcher-install
+FROM install-browser AS gpt-researcher-install
 
 ENV PIP_ROOT_USER_ACTION=ignore
 
@@ -28,7 +28,16 @@ WORKDIR /usr/src/app
 COPY ./requirements.txt ./requirements.txt
 RUN pip install -r requirements.txt
 
+COPY ./multi_agents/requirements.txt ./multi_agents/requirements.txt
+RUN pip install -r multi_agents/requirements.txt
+
 FROM gpt-researcher-install AS gpt-researcher
+
+ARG OPENAI_API_KEY
+ARG TAVILY_API_KEY
+
+ENV OPENAI_API_KEY=${OPENAI_API_KEY}
+ENV TAVILY_API_KEY=${TAVILY_API_KEY}
 
 RUN useradd -ms /bin/bash gpt-researcher \
     && chown -R gpt-researcher:gpt-researcher /usr/src/app
