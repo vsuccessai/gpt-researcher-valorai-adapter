@@ -15,13 +15,23 @@ or
 1.2 Execute: uvicorn main:app --reload
 
 
-# How to launch the updated service: 
+# How to launch the updated service for Valor: 
 
 1. Execute: uvicorn extended_main:app --reload
 or
 1.1 Run extended_main.py in VS code 
-or
+or compose file 
 1.2 docker-compose -f docker-compose.valor.yml up --build  This will launch only the backend but still will have default front end from python 
+
+
+# How to launch standalone updated service for Gerardo server: 
+
+INFO: Dockerfile.extended - is a general extended Dockerfile that is used for Python backend can also be used for Valor
+1. Execute: uvicorn extended_main:app --reload
+or 
+1.1 Run extended_main.py in VS code - this will launch Python front and backend 
+or compose file
+1.2 docker-compose -f docker-compose-standalone.local.yml up --build  - this will launch Python + React 
 
 
 ## Local Development

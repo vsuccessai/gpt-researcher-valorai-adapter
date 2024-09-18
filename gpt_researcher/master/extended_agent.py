@@ -9,8 +9,8 @@ sys.path.insert(0, add_path)
 
 from gpt_researcher.master.agent import GPTResearcher
 from gpt_researcher.config import ExtConfig
-from gpt_researcher.context.compression import ContextCompressor, WrittenContentCompressor
-from gpt_researcher.document import DocumentLoader, LangChainDocumentLoader
+# from gpt_researcher.context.compression import ContextCompressor, WrittenContentCompressor
+# from gpt_researcher.document import DocumentLoader, LangChainDocumentLoader
 from gpt_researcher.master.actions import *
 from gpt_researcher.memory import Memory
 from gpt_researcher.utils.enum import ReportSource, ReportType, Tone
@@ -92,10 +92,11 @@ class ExtendGPTResearcher(GPTResearcher):
         # Stores all the user provided subtopics
         self.subtopics = subtopics        
 
+#for testing purposes
+#print(ExtConfig().__dict__)
 # async def main():
 #     query = "What is the capital of France?"
-#     cfg = ExtConfig()
-#     gpt_researcher = ExtendGPTResearcher(query=query, cfg=cfg)
+#     gpt_researcher = ExtendGPTResearcher(query=query)
 #     content = await gpt_researcher.conduct_research()
 #     return content
 

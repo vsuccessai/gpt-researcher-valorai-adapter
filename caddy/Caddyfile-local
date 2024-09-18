@@ -1,0 +1,14 @@
+https://localhost {
+    tls internal
+    route {        
+        handle /api/* {
+            reverse_proxy gpt-researcher:8000
+        }
+
+        handle * {
+            reverse_proxy gptr-nextjs:3000
+
+        }      
+        
+    }
+}

@@ -39,6 +39,17 @@ class ConfigRequest(BaseModel):
     SERPER_API_KEY: str = ''
     SEARX_URL: str = ''
 
+class ConfigAppRequest(BaseModel):    
+    LLM_PROVIDER: str
+    SMART_LLM_MODEL: str
+    RETRIEVER: str = "tavily"
+    SMART_TOKEN_LIMIT: int = 4000
+    TEMPERATURE: float = 0.55
+    LLM_TEMPERATURE: float = 0.55
+    TOTAL_WORDS: int = 1000
+    REPORT_FORMAT: str = "APA"
+
+
 app = FastAPI()
 
 app.mount("/site", StaticFiles(directory="./frontend"), name="site")
@@ -127,7 +138,9 @@ async def get_config(
         "SEARX_URL": searx_url if searx_url else os.getenv("SEARX_URL", ""),
         "LANGCHAIN_TRACING_V2": os.getenv("LANGCHAIN_TRACING_V2", "true"),
         "DOC_PATH": os.getenv("DOC_PATH", ""),
-        "RETRIEVER": os.getenv("RETRIEVER", "")
+        "RETRIEVER": os.getenv("RETRIEVER", ""),
+        "EMBEDDING_PROVIDER": os.getenv("EMBEDDING_PROVIDER", ""),
+        "SMART_LLM_MODEL": os.getenv("SMART_LLM_MODEL", ""),
     }
     return config
 
@@ -147,6 +160,41 @@ async def set_config(config: ConfigRequest):
     os.environ["SERPER_API_KEY"] = config.SERPER_API_KEY
     os.environ["SEARX_URL"] = config.SEARX_URL
     return {"message": "Config updated successfully"}
+
+@app.get("/api/getAppConfig")
+async def get_config(
+    llm_provider: str = Header(None),
+    smart_llm_model: str = Header(None),
+    retriever: str = Header(None),
+    smart_token_limit: int = Header(None),
+    temperature: float = Header(None),
+    llm_temperature: float = Header(None),
+    total_words: int = Header(None),
+    report_format: str = Header(None)
+):
+    config = {
+        "LLM_PROVIDER": llm_provider if llm_provider else os.getenv("LLM_PROVIDER", ""),
+        "SMART_LLM_MODEL": smart_llm_model if smart_llm_model else os.getenv("SMART_LLM_MODEL", ""),
+        "RETRIEVER": retriever if retriever else os.getenv("RETRIEVER", ""),
+        "SMART_TOKEN_LIMIT": smart_token_limit if smart_token_limit else os.getenv("SMART_TOKEN_LIMIT", ""),
+        "TEMPERATURE": temperature if temperature else os.getenv("TEMPERATURE", ""),
+        "LLM_TEMPERATURE": llm_temperature if llm_temperature else os.getenv("LLM_TEMPERATURE", ""),
+        "TOTAL_WORDS": total_words if total_words else os.getenv("TOTAL_WORDS", ""),
+        "REPORT_FORMAT": report_format if report_format else os.getenv("REPORT_FORMAT", ""),        
+    }
+    return config
+
+@app.post("/api/setAppConfig")
+async def set_config(config: ConfigAppRequest):
+    os.environ["LLM_PROVIDER"] = config.LLM_PROVIDER
+    os.environ["SMART_LLM_MODEL"] = config.SMART_LLM_MODEL
+    os.environ["RETRIEVER"] = config.RETRIEVER
+    os.environ["SMART_TOKEN_LIMIT"] = str(config.SMART_TOKEN_LIMIT)
+    os.environ["TEMPERATURE"] = str(config.TEMPERATURE)
+    os.environ["LLM_TEMPERATURE"] = str(config.LLM_TEMPERATURE)
+    os.environ["TOTAL_WORDS"] = str(config.TOTAL_WORDS)
+    os.environ["REPORT_FORMAT"] = config.REPORT_FORMAT 
+    return {"message": "App config updated successfully"}
 
 # Enable CORS for your frontend domain (adjust accordingly)
 app.add_middleware(
