@@ -65,6 +65,10 @@ export default function Home() {
         let { host } = window.location;
         host = host.includes('localhost') ? 'localhost:8000' : host;
         const ws_uri = `${protocol === 'https:' ? 'wss:' : 'ws:'}//${host}${pathname}ws`;
+        //const ws_uri = 'TEST';
+       // const ws_uri = 'ws://localhost:8000/ws';
+        console.log('FLAG', ws_uri);
+        
 
         const newSocket = new WebSocket(ws_uri);
         setSocket(newSocket);

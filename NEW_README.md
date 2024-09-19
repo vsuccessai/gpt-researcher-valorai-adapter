@@ -24,7 +24,7 @@ or compose file
 1.2 docker-compose -f docker-compose.valor.yml up --build  This will launch only the backend but still will have default front end from python 
 
 
-# How to launch standalone updated service for Gerardo server: 
+# How to launch standalone updated service for Gerardo server LOCAL: 
 
 INFO: Dockerfile.extended - is a general extended Dockerfile that is used for Python backend can also be used for Valor
 1. Execute: uvicorn extended_main:app --reload

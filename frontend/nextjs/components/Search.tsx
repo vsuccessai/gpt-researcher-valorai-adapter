@@ -22,6 +22,7 @@ const Search = () => {
       let { host } = window.location;
       host = host.includes('localhost') ? 'localhost:8000' : host;
       const ws_uri = `${protocol === 'https:' ? 'wss:' : 'ws:'}//${host}${pathname}ws`;
+      //const ws_uri = 'https://127.0.1/ws';
       
       const newSocket = new WebSocket(ws_uri);
       setSocket(newSocket);
