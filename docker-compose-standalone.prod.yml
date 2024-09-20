@@ -35,7 +35,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./caddy/Caddyfile-production:/etc/caddy/Caddyfile
+      - ./caddy/Caddyfile-prod:/etc/caddy/Caddyfile
       - ./caddy/data:/data
       - ./frontend/nextjs/public:/usr/share/caddy
     depends_on:
