@@ -10,7 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
-#from backend.utils import write_md_to_pdf, write_md_to_word, write_text_to_md
+from backend.utils import write_md_to_pdf, write_md_to_word, write_text_to_md
 from backend.extended_websocket_manager import ExtendedWebSocketManager
 
 import shutil
@@ -88,18 +88,45 @@ async def websocket_endpoint(websocket: WebSocket):
                 json_data = json.loads(data[6:])
                 task = json_data.get("task")
                 report_type = json_data.get("report_type")
-                # source_urls = json_data.get("source_urls")
-                # tone = json_data.get("tone")
-                # headers = json_data.get("headers", {})    
-                # report_source = json_data.get("report_source")
-                # retrievers = json_data.get("retrievers")
-                #print(json_data)
-                #Run the agent
+                source_urls = json_data.get("source_urls")
+                tone = json_data.get("tone")
+                headers = json_data.get("headers", {})
+                filename = f"task_{int(time.time())}_{task}"
+                sanitized_filename = sanitize_filename(
+                    filename
+                )  # Sanitize the filename
+                report_source = json_data.get("report_source")
                 if task and report_type:
                     report = await manager.start_streaming(
-                       websocket=websocket, **json_data
+                        task, report_type, report_source, source_urls, tone, websocket, headers
                     )
-                    await websocket.send_json({"type": "path", "report": report}) #finish the websocket connection         
+                    # Ensure report is a string
+                    if not isinstance(report, str):
+                        report = str(report)
+
+                    # Saving report as pdf
+                    pdf_path = await write_md_to_pdf(report, sanitized_filename)
+                    # Saving report as docx
+                    docx_path = await write_md_to_word(report, sanitized_filename)
+                    # Returning the path of saved report files
+                    md_path = await write_text_to_md(report, sanitized_filename)
+                    await websocket.send_json(
+                        {
+                            "type": "path",
+                            "output": {
+                                "pdf": pdf_path,
+                                "docx": docx_path,
+                                "md": md_path,
+                            },
+                        }
+                    )
+                elif data.startswith("human_feedback"):
+                    # Handle human feedback
+                    feedback_data = json.loads(data[14:])  # Remove "human_feedback" prefix
+                    # Process the feedback data as needed
+                    # You might want to send this feedback to the appropriate agent or update the research state
+                    print(f"Received human feedback: {feedback_data}")
+                    # You can add logic here to forward the feedback to the appropriate agent or update the research state
                 else:
                     print("Error: not enough parameters provided.")
     except WebSocketDisconnect:

@@ -56,7 +56,7 @@ export default function Home() {
       'bing_api_key': apiVariables.BING_API_KEY,
       'serpapi_api_key': apiVariables.SERPAPI_API_KEY,
       'serper_api_key': apiVariables.SERPER_API_KEY,
-      'searx_url': apiVariables.SEARX_URL
+      'searx_url': apiVariables.SEARX_URL, 
     };
 
     if (!socket) {
@@ -66,7 +66,7 @@ export default function Home() {
         host = host.includes('localhost') ? 'localhost:8000' : host;
         const ws_uri = `${protocol === 'https:' ? 'wss:' : 'ws:'}//${host}${pathname}ws`;
         //const ws_uri = 'TEST';
-       // const ws_uri = 'ws://localhost:8000/ws';
+       //const ws_uri = 'ws://localhost:8000/ws';
         console.log('FLAG', ws_uri);
         
 

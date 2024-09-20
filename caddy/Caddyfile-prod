@@ -1,14 +1,16 @@
-https://localhost {
+https://8a38-178-150-77-146.ngrok-free.app {
     tls internal
-    route {        
+
         handle /api/* {
             reverse_proxy gpt-researcher:8000
         }
         handle /getConfig {
             reverse_proxy gpt-researcher:8000
-        }
-        
+        }        
         handle /ws* {
+            reverse_proxy gpt-researcher:8000
+            }
+        handle /outputs/* {
             reverse_proxy gpt-researcher:8000
             }
 
@@ -16,7 +18,5 @@ https://localhost {
             reverse_proxy gptr-nextjs:3000
 
         }      
-        
-    }
-}
 
+}
