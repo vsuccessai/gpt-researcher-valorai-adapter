@@ -13,10 +13,10 @@ http://54.226.175.127 {
         handle /outputs* {
             reverse_proxy gpt-researcher:8000
             }
-        handle /upload/{
+        handle /upload/ {
             reverse_proxy gpt-researcher:8000
         }
-        handle /files/*{
+        handle /files/* {
             reverse_proxy gpt-researcher:8000
         }
 

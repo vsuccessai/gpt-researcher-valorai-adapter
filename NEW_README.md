@@ -26,11 +26,8 @@ or compose file
 
 # How to launch standalone updated service for Gerardo server LOCAL: 
 
-<<<<<<< HEAD
-=======
 IMPORTANT: git branch name "local"
 IMPORTANT: if you have an issue with the websocket connection in local development check front end page component for a quick fix
->>>>>>> development
 INFO: Dockerfile.extended - is a general extended Dockerfile that is used for Python backend can also be used for Valor
 1. Execute: uvicorn extended_main:app --reload
 or 
