@@ -8,7 +8,7 @@ const Header = () => {
         <div className="col-span-2 flex items-center justify-center">
           <a href="/">
             <Image
-              src="/img/gptr-logo.png"
+              src="/img/vs-logo.png"
               alt="logo"
               width={60}
               height={60}

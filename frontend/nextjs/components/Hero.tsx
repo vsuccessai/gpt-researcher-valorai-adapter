@@ -35,7 +35,7 @@ const Hero: FC<THeroProps> = ({
               </span>
             </h1>
             <h2 className="text-xl font-light text-center mb-4 ml-[20vw] mr-[20vw] mb-10 text-gray-300">
-              Say Hello to GPT Researcher, your AI mate for rapid insights and comprehensive research
+              Say Hello to Vet Success Researcher, your AI mate for rapid insights and comprehensive research
             </h2>
         </div>
         
@@ -50,7 +50,7 @@ const Hero: FC<THeroProps> = ({
         </div>
 
         {/* Suggestions section */}
-        <div className="flex flex-wrap items-center justify-center gap-2.5 pb-[30px] lg:flex-nowrap lg:justify-normal">
+        {/* <div className="flex flex-wrap items-center justify-center gap-2.5 pb-[30px] lg:flex-nowrap lg:justify-normal">
           {suggestions.map((item) => (
             <div
               className="flex h-[35px] cursor-pointer items-center justify-center gap-[5px] rounded border border-solid border-[#C1C1C1] bg-[#EDEDEA] px-2.5 py-2"
@@ -69,7 +69,7 @@ const Hero: FC<THeroProps> = ({
               </span>
             </div>
           ))}
-        </div>
+        </div> */}
 
       </div>
   
