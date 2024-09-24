@@ -41,3 +41,4 @@ package-lock.json
 
 #Vim swp files
 *.swp
+caddy/data/caddy/last_clean.json
