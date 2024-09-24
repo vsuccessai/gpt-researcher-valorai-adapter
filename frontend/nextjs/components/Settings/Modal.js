@@ -124,10 +124,10 @@ export default function Modal({ setChatBoxSettings, chatBoxSettings }) {
             <div className="relative w-auto my-6 mx-auto max-w-3xl">
               <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
                 <div className="relative p-6 flex-auto">
-                  <div className="tabs">
+                  {/* <div className="tabs">
                     <button onClick={() => setActiveTab('search')} className={`tab-button ${activeTab === 'search' ? 'active' : ''}`}>Search Settings</button>
                     <button onClick={() => setActiveTab('api')} className={`tab-button ${activeTab === 'api' ? 'active' : ''}`}>API Variables</button>
-                  </div>
+                  </div> */}
                   {activeTab === 'search' && (
                     <div className="App">
                       <header className="App-header">

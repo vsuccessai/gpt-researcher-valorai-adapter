@@ -26,6 +26,11 @@ or compose file
 
 # How to launch standalone updated service for Gerardo server LOCAL: 
 
+<<<<<<< HEAD
+=======
+IMPORTANT: git branch name "local"
+IMPORTANT: if you have an issue with the websocket connection in local development check front end page component for a quick fix
+>>>>>>> development
 INFO: Dockerfile.extended - is a general extended Dockerfile that is used for Python backend can also be used for Valor
 1. Execute: uvicorn extended_main:app --reload
 or 
@@ -34,8 +39,8 @@ or compose file
 1.2 docker-compose -f docker-compose-standalone.local.yml up --build  - this will launch Python + React 
 
 # How to launch standalone updated service for Gerardo server Prod: 
-IMPORTANT: git branch name "prod" checkout on the server
-1. docker-compose -f docker-compose-standalone.prod.yml up --build  - this will launch Python + React 
+IMPORTANT: git branch name "prod" checkout on the server for Ubuntu
+1. sudo docker compose -f docker-compose-standalone.prod.yml up --build  - this will launch Python + React 
 
 
 ## Local Development

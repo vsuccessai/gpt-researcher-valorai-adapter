@@ -1,4 +1,4 @@
-https://142a-178-150-77-146.ngrok-free.app  {
+http://54.226.175.127 {
     tls internal
 
         handle /api/* {
@@ -10,9 +10,15 @@ https://142a-178-150-77-146.ngrok-free.app  {
         handle /ws* {
             reverse_proxy gpt-researcher:8000
             }
-        handle /outputs/* {
+        handle /outputs* {
             reverse_proxy gpt-researcher:8000
             }
+        handle /upload/{
+            reverse_proxy gpt-researcher:8000
+        }
+        handle /files/*{
+            reverse_proxy gpt-researcher:8000
+        }
 
         handle * {
             reverse_proxy gptr-nextjs:3000
@@ -20,26 +26,3 @@ https://142a-178-150-77-146.ngrok-free.app  {
         }      
 
 }
-
-https://localhost {
-    tls internal
-    route {        
-        handle /api/* {
-            reverse_proxy gpt-researcher:8000
-        }
-        handle /getConfig {
-            reverse_proxy gpt-researcher:8000
-        }
-        
-        handle /ws* {
-            reverse_proxy gpt-researcher:8000
-            }
-
-        handle * {
-            reverse_proxy gptr-nextjs:3000
-
-        }      
-        
-    }
-}
-
