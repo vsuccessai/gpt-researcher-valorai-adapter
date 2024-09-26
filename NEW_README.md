@@ -1,6 +1,7 @@
 ## UPDATES: 
 1. The main endpoint uri = "ws://localhost:8008/ws" (websocket) can accept any parameters from class Config to tune the LLM replies 
 2. IMPORTANT: The original files were not changed. All the files with the updates has prefix "extended" extended_original_file_name.py 
+3. IMPORTANT: getHost function (next js) was updated to handle http and https schemas
 
 ## How to launch
 
