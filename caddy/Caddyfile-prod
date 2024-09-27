@@ -21,8 +21,37 @@ http://54.226.175.127 {
         }
 
         handle * {
+            basic_auth {
+            vetsuccess $2a$14$V9GrmaN6oGb8OJ8Y73YeGexexNYvdgyBDhe3i6OtQHZi4fG5C/oGy
+                    }
             reverse_proxy gptr-nextjs:3000
-
         }      
 
 }
+
+# http://54.226.175.127 {
+#     tls internal
+
+#     @backend {
+#         path /api/* /getConfig /ws* /outputs* /upload/* /files/*
+#     }
+
+#     handle @backend {
+#         reverse_proxy {
+#             to gpt-researcher:8000
+#             transport http {
+#                 basic_auth vetsuccess vetsuccess_pass
+#             }
+#         }
+#     }
+#         handle * {
+
+#             basic_auth {
+#             vetsuccess $2a$14$V9GrmaN6oGb8OJ8Y73YeGexexNYvdgyBDhe3i6OtQHZi4fG5C/oGy
+#                     }
+#             reverse_proxy gptr-nextjs:3000
+
+#         }      
+
+# }
+

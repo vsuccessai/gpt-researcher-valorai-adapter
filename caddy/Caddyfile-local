@@ -2,19 +2,69 @@ https://localhost {
         tls internal
           
         handle /api/* {
-            reverse_proxy gpt-researcher:8000
+            reverse_proxy gpt-researcher:8000            
         }
-        handle /getConfig {
-            reverse_proxy gpt-researcher:8000
+        handle /getConfig {           
+            reverse_proxy gpt-researcher:8000 
         }
         
         handle /ws* {
             reverse_proxy gpt-researcher:8000
             }
-
+        
+        # basic_auth * {
+        #     Bob $2a$14$Zkx19XLiW6VYouLHR5NmfOFU0z2GTNmpkT/5qqR7hx4IjWJPDhjvG
+        #             }
+        #         reverse_proxy gptr-nextjs:3000
         handle * {
-            reverse_proxy gptr-nextjs:3000
+            # Username "valor", password "valorpass"            
+            basic_auth {
+            valor $2a$14$G0.J7Qm1BFf.So3L3BpPfOqlcfa0d5ylI6Ia4yyffBLk9P3Mvf.3S
+                    }
+            reverse_proxy gptr-nextjs:3000 
         }    
+
+        handle /test {
+            redir https://localhost 
+        }
     
 }
+
+# https://localhost {
+#         tls internal
+
+#         @backend {
+#             path /api/* /getConfig /ws*
+#         }
+
+#         handle @backend {
+#             reverse_proxy {
+#                 to gpt-researcher:8000
+#                 transport http {
+#                     basic_auth valor valorpass
+#                 }
+#             }
+#         }
+          
+#         # handle /api/* {
+#         #     reverse_proxy gpt-researcher:8000
+#         # }
+#         # handle /getConfig {
+#         #     reverse_proxy gpt-researcher:8000
+#         # }
+        
+#         # handle /ws* {
+#         #     reverse_proxy gpt-researcher:8000
+#         #     }        
+
+#         #         reverse_proxy gptr-nextjs:3000
+#         handle * {
+#             # Username "valor", password "valorpass"
+#             basic_auth {
+#             valor $2a$14$G0.J7Qm1BFf.So3L3BpPfOqlcfa0d5ylI6Ia4yyffBLk9P3Mvf.3S
+#                     }
+#             reverse_proxy gptr-nextjs:3000
+#         }    
+    
+# }
 
