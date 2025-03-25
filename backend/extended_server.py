@@ -169,6 +169,7 @@ async def get_config(
         "DOC_PATH": os.getenv("DOC_PATH", ""),
         "RETRIEVER": os.getenv("RETRIEVER", ""),
         "EMBEDDING_PROVIDER": os.getenv("EMBEDDING_PROVIDER", ""),
+        "ANTHROPIC_API_KEY": os.getenv("ANTHROPIC_API_KEY", ""),
     }
     return config
 
