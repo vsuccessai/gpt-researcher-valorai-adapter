@@ -16,10 +16,8 @@ def generate_search_queries_prompt(
         parent_query (str): The main question (only relevant for detailed reports)
         report_type (str): The report type
         max_iterations (int): The maximum number of search queries to generate
-
     Returns: str: The search queries prompt for the given question
     """
-
     if (
         report_type == ReportType.DetailedReport.value
         or report_type == ReportType.SubtopicReport.value
@@ -27,12 +25,18 @@ def generate_search_queries_prompt(
         task = f"{parent_query} - {question}"
     else:
         task = question
-
     return (
-        f'Write {max_iterations} google search queries to search online that form an objective opinion from the following task: "{task}"\n'
-        f"Assume the current date is {datetime.now(timezone.utc).strftime('%B %d, %Y')} if required.\n"
-        f'You must respond with a list of strings in the following format: ["query 1", "query 2", "query 3"].\n'
-        f"The response should contain ONLY the list."
+        f'Formulate {max_iterations} strategic Google search queries to find high-quality, evidence-based information on: "{task}"\n\n'
+        f"Your queries MUST target:\n"
+        f"1. Peer-reviewed journals and academic databases (e.g., JSTOR, PubMed, Google Scholar)\n"
+        f"2. Government statistical databases and reports (e.g., CDC, BLS, WHO, World Bank)\n"
+        f"3. Industry research papers with quantitative data and statistical analysis\n"
+        f"4. Recent publications with up-to-date statistics (within last 2-3 years when possible)\n"
+        f"5. Sources containing specific metrics, figures, percentages, and quantitative evidence\n\n"
+        f"Include specific search operators where appropriate (e.g., site:.edu, site:.gov, filetype:pdf)\n"
+        f"Assume the current date is {datetime.now(timezone.utc).strftime('%B %d, %Y')}.\n\n"
+        f'Respond ONLY with a JSON-formatted list of strings: ["query 1", "query 2", "query 3"].\n'
+        f"NO explanations or additional text."
     )
 
 
@@ -42,51 +46,69 @@ def generate_report_prompt(
     report_source: str,
     report_format="apa",
     total_words=1000,
-    tone=None,
+    tone: Tone =None,
 ):
     """Generates the report prompt for the given question and research summary.
     Args: question (str): The question to generate the report prompt for
             research_summary (str): The research summary to generate the report prompt for
     Returns: str: The report prompt for the given question and research summary
     """
-
     reference_prompt = ""
     if report_source == ReportSource.Web.value:
         reference_prompt = f"""
-You MUST write all used source urls at the end of the report as references, and make sure to not add duplicated sources, but only one reference for each.
-Every url should be hyperlinked: [url website](url)
-Additionally, you MUST include hyperlinks to the relevant URLs wherever they are referenced in the report: 
-
-eg: Author, A. A. (Year, Month Date). Title of web page. Website Name. [url website](url)
-"""
+    You MUST include properly formatted citations for all sources used. For each source:
+    1. Create in-text citations at the point where information is used: ([Author/Website Name, Year](url))
+    2. Include a comprehensive references section at the end with full bibliographic information
+    3. Ensure every URL is properly hyperlinked using markdown: [Title or Website Name](complete-url)
+    4. Prioritize academic, governmental, and authoritative industry sources in your citations
+    5. When citing statistics or quantitative data, always include the specific source
+    """
     else:
         reference_prompt = f"""
-You MUST write all used source document names at the end of the report as references, and make sure to not add duplicated sources, but only one reference for each."
-"""
-
-    tone_prompt = f"Write the report in a {tone.value} tone." if tone else ""
-
+    You MUST include properly formatted citations for all document sources used:
+    1. Create in-text citations at the point where information is used: (Document Name, Section/Page)
+    2. Include a comprehensive references section listing all documents with full metadata
+    3. For statistical information, specify the exact page number, table, or section where the data appears
+    4. Prioritize primary research documents and original data sources over secondary analyses
+    """
+    try: 
+        tone_prompt = f"Write the report in a {tone.value} tone" if tone else ""
+    except:
+        tone_prompt = ""
     return f"""
-Information: "{context}"
----
-Using the above information, answer the following query or task: "{question}" in a detailed report --
-The report should focus on the answer to the query, should be well structured, informative, 
-in-depth, and comprehensive, with facts and numbers if available and a total of up to {total_words} words.
-You should strive to write the report as long as you can using all relevant and necessary information provided.
-
-Please follow all of the following guidelines in your report:
-- You MUST determine your own concrete and valid opinion based on the given information. Do NOT defer to general and meaningless conclusions.
-- You MUST write the report with markdown syntax and {report_format} format.
-- You MUST prioritize the relevance, reliability, and significance of the sources you use. Choose trusted sources over less reliable ones.
-- You must also prioritize new articles over older articles if the source can be trusted.
-- Use in-text citation references in {report_format} format and make it with markdown hyperlink placed at the end of the sentence or paragraph that references them like this: ([in-text citation](url)).
-- Don't forget to add a reference list at the end of the report in {report_format} format and full url links without hyperlinks.
-- {reference_prompt}
-- {tone_prompt}
-
-Please do your best, this is very important to my career.
-Assume that the current date is {date.today()}.
-"""
+    RESEARCH CONTEXT:
+    "{context}"
+    ---
+    TASK:
+    Create a comprehensive, evidence-based report addressing: "{question}"
+    REPORT REQUIREMENTS:
+    • Structure: Well-organized with clear sections, headings, and logical flow
+    • Content: Data-driven analysis with EXTENSIVE quantitative evidence including:
+    - Specific statistics, percentages, and numerical data
+    - Trend analysis with year-over-year comparisons where available
+    - Demographic breakdowns and segmentation data
+    - Economic figures, costs, and financial metrics when relevant
+    - Visual representation recommendations (tables, charts) for complex data
+    • Evidence Quality: Prioritize peer-reviewed research, government data, and authoritative sources
+    • Depth: In-depth exploration with minimum {total_words} words, utilizing all relevant information
+    • Format: Professional markdown formatting with {report_format.upper()} citation style
+    ANALYTICAL APPROACH:
+    • Quantify ALL key points with specific numbers and statistics
+    • Include confidence intervals, sample sizes, and methodological context for statistics when available
+    • Compare multiple data sources to establish consensus figures or highlight discrepancies
+    • Explicitly identify data limitations, collection methodologies, and potential biases
+    • Translate complex statistical findings into clear, actionable insights
+    CRITICAL GUIDELINES:
+    • NEVER make general claims without supporting quantitative evidence
+    • ALWAYS specify the exact figures, percentages, and metrics
+    • Include trend data showing changes over time whenever possible
+    • When exact figures aren't available, provide estimated ranges based on available data
+    • For controversial topics, quantify different perspectives with data supporting each position
+    {reference_prompt}
+    {tone_prompt}
+    This report will be used for critical decision-making requiring precise quantitative understanding.
+    Current date: {date.today()}
+    """
 
 
 def generate_resource_report_prompt(

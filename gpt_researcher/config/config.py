@@ -29,10 +29,10 @@ class Config:
         self.memory_backend = os.getenv('MEMORY_BACKEND', "local")
         self.total_words = int(os.getenv('TOTAL_WORDS', 1000))
         self.report_format = os.getenv('REPORT_FORMAT', "APA")
-        self.max_iterations = int(os.getenv('MAX_ITERATIONS', 3))
+        self.max_iterations = int(os.getenv('MAX_ITERATIONS', 5))
         self.agent_role = os.getenv('AGENT_ROLE', None)
         self.scraper = os.getenv("SCRAPER", "bs")
-        self.max_subtopics = os.getenv("MAX_SUBTOPICS", 3)
+        self.max_subtopics = os.getenv("MAX_SUBTOPICS", 5)
         self.report_source = os.getenv("REPORT_SOURCE", None)
         self.doc_path = os.getenv("DOC_PATH", "")
         self.llm_kwargs = {} 
