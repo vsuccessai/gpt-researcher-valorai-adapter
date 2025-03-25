@@ -42,10 +42,12 @@ class ConfigRequest(BaseModel):
 class ConfigAppRequest(BaseModel):    
     LLM_PROVIDER: str
     SMART_LLM_MODEL: str
+    SMART_TOKEN_LIMIT: int 
+    TEMPERATURE: float
+    LLM_TEMPERATURE: float 
+    FAST_LLM_MODEL: str 
+    FAST_TOKEN_LIMIT: int 
     RETRIEVER: str = "tavily"
-    SMART_TOKEN_LIMIT: int = 4000
-    TEMPERATURE: float = 0.55
-    LLM_TEMPERATURE: float = 0.55
     TOTAL_WORDS: int = 1000
     REPORT_FORMAT: str = "APA"
 
@@ -141,7 +143,7 @@ async def run_multi_agents():
     else:
         return JSONResponse(status_code=400, content={"message": "No active WebSocket connection"})
 
-@app.get("/getConfig")
+@app.get("/api/getConfig")
 async def get_config(
     langchain_api_key: str = Header(None),
     openai_api_key: str = Header(None),
@@ -167,11 +169,10 @@ async def get_config(
         "DOC_PATH": os.getenv("DOC_PATH", ""),
         "RETRIEVER": os.getenv("RETRIEVER", ""),
         "EMBEDDING_PROVIDER": os.getenv("EMBEDDING_PROVIDER", ""),
-        "SMART_LLM_MODEL": os.getenv("SMART_LLM_MODEL", ""),
     }
     return config
 
-@app.post("/setConfig")
+@app.post("/api/setConfig")
 async def set_config(config: ConfigRequest):
     os.environ["ANTHROPIC_API_KEY"] = config.ANTHROPIC_API_KEY
     os.environ["TAVILY_API_KEY"] = config.TAVILY_API_KEY
@@ -207,7 +208,10 @@ async def get_config(
         "TEMPERATURE": temperature if temperature else os.getenv("TEMPERATURE", ""),
         "LLM_TEMPERATURE": llm_temperature if llm_temperature else os.getenv("LLM_TEMPERATURE", ""),
         "TOTAL_WORDS": total_words if total_words else os.getenv("TOTAL_WORDS", ""),
-        "REPORT_FORMAT": report_format if report_format else os.getenv("REPORT_FORMAT", ""),        
+        "REPORT_FORMAT": report_format if report_format else os.getenv("REPORT_FORMAT", ""),
+        #additional settings 
+        "FAST_LLM_MODEL": os.getenv("FAST_LLM_MODEL", ""),      
+        "FAST_TOKEN_LIMIT" : os.getenv("FAST_TOKEN_LIMIT", ""),
     }
     return config
 
@@ -221,6 +225,8 @@ async def set_config(config: ConfigAppRequest):
     os.environ["LLM_TEMPERATURE"] = str(config.LLM_TEMPERATURE)
     os.environ["TOTAL_WORDS"] = str(config.TOTAL_WORDS)
     os.environ["REPORT_FORMAT"] = config.REPORT_FORMAT 
+    os.environ["FAST_LLM_MODEL"] = config.FAST_LLM_MODEL
+    os.environ["FAST_TOKEN_LIMIT"] = str(config.FAST_TOKEN_LIMIT)
     return {"message": "App config updated successfully"}
 
 # Enable CORS for your frontend domain (adjust accordingly)

@@ -4,9 +4,10 @@ https://localhost {
         handle /api/* {
             reverse_proxy gpt-researcher:8000            
         }
-        handle /getConfig {           
-            reverse_proxy gpt-researcher:8000 
-        }
+        
+        # handle /getConfig {           
+        #     reverse_proxy gpt-researcher:8000 
+        # }
         
         handle /ws* {
             reverse_proxy gpt-researcher:8000
